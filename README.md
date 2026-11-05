@@ -27,3 +27,10 @@ OpenSSL 1.1.1s 的 `Configurations/10-main.conf` 里**自带 `linux64-loongarch6
 
 - 安装到 `installed/lib`（不是 `lib64`），后续链接时要同时给 `-L.../lib -L.../lib64`。
 - Doris 的 brpc 依赖它；动态库 `libcrypto.so.1.1` / `libssl.so.1.1` 运行时需要 `LD_LIBRARY_PATH`。
+
+## 更新（2026-11-04）
+
+最终链接 `doris_be` 时确认：openssl 落在 `installed/lib`，而 brpc / protobuf / glog 落在 `installed/lib64`，
+**链接行两个 `-L` 都要给**，缺 `lib` 会报 `cannot find -lssl`。
+`doris_be` 是动态链接，启动时还须 `LD_LIBRARY_PATH=$HOME/doris-port/installed/lib`（`libcrypto.so.1.1` / `libssl.so.1.1`）。
+brpc / thrift 的 TLS 依赖全部验证通过，0 undefined symbol。
